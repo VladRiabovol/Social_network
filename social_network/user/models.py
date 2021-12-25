@@ -7,7 +7,8 @@ class User(AbstractUser):
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
-    last_login = models.DateTimeField(blank=True)
+    last_login = models.DateTimeField(blank=True, null=True)
+    last_request = models.DateTimeField(blank=True, null=True)
     username = None
 
     USERNAME_FIELD = 'email'
