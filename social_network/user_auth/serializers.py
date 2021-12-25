@@ -11,4 +11,5 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         token['email'] = user.email
         update_login = User.objects.filter(email=user.email).update(last_login=datetime.now())
+        print(update_login)
         return token
