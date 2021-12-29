@@ -6,6 +6,6 @@ class UserActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'last_login', 'last_request']
+        fields = ['id', 'name', 'email', 'last_login']
 
 
