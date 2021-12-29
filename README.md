@@ -15,3 +15,5 @@ aggregated by day.
 - user activity an endpoint which will show when user was login last time and when he
 mades a last request to the service.
 - Implement token authentication (JWT is prefered)
+
+## Link to the video how does it works - https://www.youtube.com/watch?v=xm7ARpjdctQ
