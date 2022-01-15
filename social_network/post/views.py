@@ -1,4 +1,4 @@
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.views import APIView
 from rest_framework import permissions
 from rest_framework import status
@@ -6,7 +6,14 @@ from rest_framework.response import Response
 from .serializers import PostSerializer, LikeSerializer
 from .models import Post, Like
 from user.models import User
+from django.shortcuts import render
 import datetime
+
+
+class ListPostView(ListAPIView):
+    queryset = Post.objects.all().order_by('-created_at')
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PostSerializer
 
 
 class CreatePostView(CreateAPIView):
@@ -46,7 +53,11 @@ class LikesRangeDateFilter(APIView):
             filtering_day = datetime.date(int(date_to[0]), int(date_to[1]), int(item))
             queryset = Like.objects.filter(created_at=filtering_day)
             aggregated_by_day[str(filtering_day)] = queryset.count()
-        message = 'Analytics about how many likes was made, aggregated by day.'
-        return Response({message: aggregated_by_day})
+        message = 'Like analytics:'
+        return Response(aggregated_by_day)
 
-    
+
+def index(request):
+    return render(request, 'index.html')
+
+

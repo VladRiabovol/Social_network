@@ -1,0 +1,195 @@
+<script>
+    $(document).ready(function () {
+        var token = 'hello'
+        //Sign up
+       $(document).on('submit', '#register', function (e) {
+          e.preventDefault();
+          $.ajax({
+		    url: '/auth/register/',
+		    type: 'POST',
+            dataType: 'html',
+		    data: $(this).serialize(),
+		    success: function(data){
+                var text = data;
+		    	$('#message').html("You have sign up!");
+                console.log(text);
+		    },
+            error: function (data) {
+                var text = data;
+		    	$('#message').html(data);
+                console.log(text);
+            },
+          });
+       });
+        // Login
+       $(document).on('submit', '#login', function (e) {
+          e.preventDefault();
+          $.ajax({
+		    url: '/auth/login/',
+		    type: 'POST',
+		    data: $(this).serialize(),
+		    success: function(data){
+		    	$('#message').html('You have login!');
+                token = data
+                console.log(token["access"], token['refresh']);
+                localStorage.setItem('token', token["access"]);
+                localStorage.setItem('token_refresh', token['refresh']);
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+       // Create post
+        $(document).on('submit', '#create-post', function (e) {
+          e.preventDefault();
+          var sbt = $(this).serialize();
+          console.log(sbt);
+          $.ajax({
+		    url: '/post/create/',
+		    type: 'POST',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    data: $(this).serialize(),
+		    success: function(data){
+		    	$('#message').html('Post created!');
+                token = data
+                console.log('success');
+		    },
+            error: function (data) {
+                $('#message').html("Post created");
+                console.log(data)
+            },
+          });
+       });
+        // User activity
+       $(document).on('submit', '#user-activity', function (e) {
+          e.preventDefault();
+          var email = $('#activity-email').val();
+          console.log(email)
+          $.ajax({
+		    url: '/users/activity/' + email,
+		    type: 'GET',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    success: function(data){
+                var name = data.name;
+                var email = data.email;
+                var last_login = data.last_login;
+		    	$('#name').html('Name: ' + name);
+                $('#email').html('Email: ' + email);
+                $('#last_login').html('Last login: ' + last_login);
+                console.log(name);
+                console.log(email);
+                console.log(last_login);
+                console.log(data);
+
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+       // Likes analytics
+       $(document).on('submit', '#analytics', function (e) {
+          e.preventDefault();
+          var sbt = $(this).serialize();
+          console.log(sbt);
+          $.ajax({
+		    url: '/post/analytics/',
+		    type: 'GET',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    data: $(this).serialize(),
+		    success: function(data){
+                var nodeNames = 'Like analytics: \n';
+                $.each(data, function (i, el) {
+                    nodeNames +=  '<li>' + i + ': ' + el + ';' + '</li>' + '\n';
+                });
+                $('#analytics-result').html(nodeNames);
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+       // All posts
+       $(document).on('submit', '#show-posts', function (e) {
+          e.preventDefault();
+          $.ajax({
+		    url: '/post/all/',
+		    type: 'GET',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    data: $(this).serialize(),
+		    success: function(data){
+                var str = "";
+                $.each(data, function (i, el) {
+
+
+                    str += '<div class="col-sm-6 col-md-6 col-lg-6">' +
+                        '<div class="card" style="width: 20rem;">' +
+                        '<div class="card-body">' +
+                        '<h5 class="card-title">' + el.author + '</h5>' +
+                        '<p class="card-text">' + el.created_at + '</p>' +
+                        '<p class="card-text">' + el.body + '</p>' +
+                        '<p>Likes(' + el.likes.length + ')</p>' +
+                        '</div>' + '<div class="card-body">' +
+                        '<button type="submit" id="like" class="btn btn-outline-danger"'+'data-post='+'"'+el.id+'"'+
+                        'data-user='+'"'+el.author + '"' + '>Like</button>' +
+                        '<button type="submit" id="unlike" class="btn btn-outline-danger"'+'data-post='+'"'+el.id+'"'+
+                        'data-user='+'"'+el.author + '"' + '>Unlike</button>' +
+                        '</div>' + '</div>' + '</div>' + '</div>';
+                });
+                $('#posts').html(str);
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+       // Create like
+        $(document).on('click', '#like', function (e) {
+          e.preventDefault();
+          var like = $(this).data();
+          var dataLike = {};
+          dataLike['post'] = like['post'];
+          dataLike['user'] = like['user'];
+          console.log(like);
+          console.log(dataLike);
+          $.ajax({
+		    url: '/post/like/',
+		    type: 'POST',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    data: like,
+		    success: function(data){
+                $('#message').html('Post liked!');
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+       // Unlike
+        $(document).on('click', '#unlike', function (e) {
+          e.preventDefault();
+          var unlike = $(this).data();
+          console.log(unlike);
+          $.ajax({
+		    url: '/post/unlike/',
+		    type: 'POST',
+            headers: {Authorization: "Bearer " + localStorage.getItem('token')},
+		    data: unlike,
+		    success: function(data){
+                $('#message').html('Post unliked!');
+		    },
+            error: function (data) {
+                $('#message').html(data);
+                console.log(data)
+            },
+          });
+       });
+    });
+</script>
+

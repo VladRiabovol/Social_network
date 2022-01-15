@@ -9,7 +9,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'author', 'body', 'created_at', 'updated_at')
+        fields = ('id', 'author', 'body', 'created_at', 'updated_at', 'likes')
 
     def create(self, validated_data):
         user = User.objects.get(email=validated_data['author'])
